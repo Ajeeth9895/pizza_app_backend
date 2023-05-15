@@ -30,6 +30,7 @@ const createToken = ({ firstName, lastName, email, role }) => {
     return token;
 };
 
+//forget password validation token
 const forgetPasswordToken = ({ firstName, lastName, email }) => {
     let token = jwt.sign({ firstName, lastName, email }, secreteKeyReset, {
         expiresIn: '30m'
@@ -37,27 +38,25 @@ const forgetPasswordToken = ({ firstName, lastName, email }) => {
     return token;
 };
 
+//decode token 
 const decodeToken = (token) => {
     let data = jwt.decode(token);
     return data;
 };
 
+//decode forget password token
 const decodePasswordToken = (token) => {
     let data = jwt.decode(token);
     return data;
 };
 
 
-
+//validation
 const validate = async (req, res, next) => {
     try {
         if (req.headers.authorization) {
             let token = req.headers.authorization.split(" ")[1]
             let data = decodeToken(token)
-
-            // console.log('validate called');
-            // console.log(req.headers.authorization);
-            // console.log(data);
 
             if ((Math.floor(Date.now() / 1000) <= data.exp)) {
                 next()
@@ -80,6 +79,7 @@ const validate = async (req, res, next) => {
     }
 }
 
+//admin validation
 const roleAdmin = async (req, res, next) => {
     try {
         if (req.headers.authorization) {

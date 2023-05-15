@@ -8,6 +8,7 @@ const { validate } = require('../config/auth');
 
 mongoose.connect(dbUrl)
 
+//save order 
 router.post('/saveOrder', async (req, res) => {
   try {
     let doc = new OrderModel(req.body);
@@ -25,7 +26,7 @@ router.post('/saveOrder', async (req, res) => {
   }
 });
 
-
+//get all orders
 router.post('/getOrder', async (req, res) => {
   try {
     let products = await OrderModel.find({ email: req.body.email })

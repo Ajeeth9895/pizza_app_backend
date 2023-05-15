@@ -8,11 +8,6 @@ const UsersSchema = new mongoose.Schema({
     lastName: { type: String, require: true },
     email: {
         type: String, require: true,
-        validate(value) {
-            if (!validator.isEmail(value)) {
-                throw new Error("Email is invalid")
-            }
-        }
     },
     mobile:{
         type: Number, require: true,

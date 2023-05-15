@@ -5,6 +5,7 @@ var crypto = require("crypto");
 var KEY_ID = 'rzp_test_ihpFW6sh6MrZFT'
 var KEY_SECRET = 'VEKA0vn2igMKmzL6NRdzuqEx';
 
+//razorpay order to validate
 router.post('/order', (req, res) => {
     try {
 
@@ -33,7 +34,7 @@ router.post('/order', (req, res) => {
     }
 })
 
-
+//razorpay verify order details
 router.post('/verify', (req, res) => {
     try {
 

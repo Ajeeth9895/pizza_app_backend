@@ -10,6 +10,7 @@ const mongoose = require('mongoose');
 // connect database
 mongoose.connect(dbUrl)
 
+
 // admin login
 router.post("/adminLogin", async (req, res) => {
     try {
@@ -48,6 +49,7 @@ router.post("/adminLogin", async (req, res) => {
     }
 });
 
+//validating only admin can access
 router.get('/getDashboard', validate, roleAdmin, async (req, res) => {
     try {
         let products = await OrderModel.find()
@@ -55,7 +57,6 @@ router.get('/getDashboard', validate, roleAdmin, async (req, res) => {
         res.status(200).send({
             products
         });
-        // console.log(products);
 
     } catch (error) {
         console.log(error);
@@ -66,6 +67,7 @@ router.get('/getDashboard', validate, roleAdmin, async (req, res) => {
     }
 });
 
+//get order details
 router.get('/getOrder', validate, async (req, res) => {
     try {
         let products = await OrderModel.find()
@@ -84,6 +86,7 @@ router.get('/getOrder', validate, async (req, res) => {
 });
 
 
+//get all products
 router.get('/getProducts', validate, async (req, res) => {
     try {
         let values = await ProductModel.find()
@@ -131,7 +134,7 @@ router.post('/create-product',validate, async (req, res) => {
     }
 });
 
-
+//change status pending to delivery
 router.post('/order-Status', async (req, res) => {
     try {
         let products = await OrderModel.findByIdAndUpdate({ _id: req.body.OrderId }, { status: req.body.Status });
