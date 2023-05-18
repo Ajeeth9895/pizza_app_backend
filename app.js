@@ -9,7 +9,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var paymentRoutes = require('./routes/payment');
 var adminRouter = require('./routes/admin')
-var orderController = require('../pizza-be/OrderController/order')
+var orderController = require('./OrderController/order')
 
 var app = express();
 
