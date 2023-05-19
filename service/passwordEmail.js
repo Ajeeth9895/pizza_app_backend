@@ -3,20 +3,20 @@ const nodemailergun = require('nodemailer-mailgun-transport');
 
 
 const passwordEmail = async ({ email, firstName, lastName, message }) => {
+  
 
   const auth = {
     auth: {
-      api_key: '7bfc9f4f9a96064890b559114cfe3e9d-81bd92f8-165f9e23',
-      domain: 'sandbox755ea099008c4a1e81e63eb48fbeba68.mailgun.org'
+      api_key: '756c2b87a44b16f9ae1a13d4c21f362c-db4df449-26c75377',
+      domain: 'sandboxcb7198d726344cc0a34de05cbaa915e3.mailgun.org'
     }
   }
 
 
   let transporter = nodemailer.createTransport(nodemailergun(auth));
 
-
   const mailOptions = {
-    from: 'ajeethkumar.gopal@gmail.com',
+    from: 'ajeevishnu2026@gmail.com',
     to: `${email}`,
     subject: "Reset password - Pizza hut ",
     html: ` <div style="background-color: antiquewhite; margin-left:25%; margin-right:25%; padding:20px;">
@@ -46,4 +46,4 @@ const passwordEmail = async ({ email, firstName, lastName, message }) => {
 
 }
 
-module.exports = { passwordEmail }
+module.exports =  {passwordEmail} 

@@ -24,7 +24,7 @@ router.post("/adminLogin", async (req, res) => {
                     email: user.email,
                     role: user.role,
                 });
-
+      
                 res.status(200).send({
                     token,
                     role: user.role,

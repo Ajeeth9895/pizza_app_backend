@@ -4,7 +4,7 @@ const { UserModel } = require('../schema/userSchema')
 const { dbUrl } = require('../config/dbConfig')
 const { hashPassword, hashCompare, createToken, decodeToken, validate, roleAdmin, forgetPasswordToken, decodePasswordToken } = require('../config/auth');
 const mongoose = require('mongoose');
-const { passwordEmail } = require('../service/passwordEmail');
+const {passwordEmail} = require('../service/passwordEmail')
 const jwt = require("jsonwebtoken");
 
 
@@ -79,6 +79,7 @@ router.post("/login", async (req, res) => {
 
 //send email
 router.post("/send-email", async (req, res) => {
+
   try {
     let user = await UserModel.findOne({ email: req.body.email });
 
@@ -91,6 +92,8 @@ router.post("/send-email", async (req, res) => {
 
       const setUserToken = await UserModel.findByIdAndUpdate({ _id: user._id }, { token: token });
 
+      console.log(setUserToken);
+
       await passwordEmail({
         firstName: user.firstName,
         lastName: user.lastName,
@@ -101,6 +104,7 @@ router.post("/send-email", async (req, res) => {
       res.status(200).send({
         message: "Email send successfully",
       });
+
     } else {
       res.status(400).send({
         message: "Email does not exists",
