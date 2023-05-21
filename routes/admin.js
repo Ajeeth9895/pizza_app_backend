@@ -17,22 +17,29 @@ router.post("/adminLogin", async (req, res) => {
         let user = await UserModel.findOne({ email: req.body.email });
 
         if (user) {
-            if (await hashCompare(req.body.password, user.password)) {
-                let token = await createToken({
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    email: user.email,
-                    role: user.role,
-                });
-      
-                res.status(200).send({
-                    token,
-                    role: user.role,
-                    user
-                });
+            if (user.role === "admin") {
+                if (await hashCompare(req.body.password, user.password)) {
+                    let token = await createToken({
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        email: user.email,
+                        role: user.role,
+                    });
+
+                    res.status(200).send({
+                        message:"Admin login successfully",
+                        token,
+                        role: user.role,
+                        user
+                    });
+                } else {
+                    res.status(400).send({
+                        message: "Invalid Credential",
+                    });
+                }
             } else {
                 res.status(400).send({
-                    message: "Invalid Credential",
+                    message: "Admin can only access",
                 });
             }
         } else {
@@ -49,26 +56,9 @@ router.post("/adminLogin", async (req, res) => {
     }
 });
 
-//validating only admin can access
-router.get('/getDashboard', validate, roleAdmin, async (req, res) => {
-    try {
-        let products = await OrderModel.find()
-
-        res.status(200).send({
-            products
-        });
-
-    } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            message: "internal server error",
-            error,
-        });
-    }
-});
 
 //get order details
-router.get('/getOrder', validate, async (req, res) => {
+router.get('/getOrder', validate,roleAdmin, async (req, res) => {
     try {
         let products = await OrderModel.find()
 
@@ -87,7 +77,7 @@ router.get('/getOrder', validate, async (req, res) => {
 
 
 //get all products
-router.get('/getProducts', validate, async (req, res) => {
+router.get('/getProducts', validate,roleAdmin, async (req, res) => {
     try {
         let values = await ProductModel.find()
 
@@ -107,7 +97,7 @@ router.get('/getProducts', validate, async (req, res) => {
 
 
 //create product
-router.post('/create-product',validate, async (req, res) => {
+router.post('/create-product', async (req, res) => {
     try {
 
         let product = await ProductModel.findOne({ name: req.body.name });
@@ -140,9 +130,9 @@ router.post('/order-Status', async (req, res) => {
         let products = await OrderModel.findByIdAndUpdate({ _id: req.body.OrderId }, { status: req.body.Status });
 
         res.status(200).send({
-            message:"Status changed successfully"
+            message: "Status changed successfully"
         });
-      
+
 
     } catch (error) {
         console.log(error);
@@ -153,5 +143,81 @@ router.post('/order-Status', async (req, res) => {
     }
 });
 
+
+//get all products
+router.post('/getSingleProduct', async (req, res) => {
+    try {
+        let values = await ProductModel.findOne({ _id: req.body.id });
+
+        res.status(200).send({
+            values
+        });
+
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            message: "internal server error",
+            error,
+        });
+    }
+});
+
+
+//update products
+router.put('/updateProduct/:id', async (req, res) => {
+    try {
+        let values = await ProductModel.findOne({ _id: req.params.id });
+
+        if (values) {
+            let doc = await ProductModel.updateOne(
+                { _id: req.params.id },
+                { $set: req.body.values },
+            );
+
+            res.status(201).send({
+                message: "product updated successfully",
+                doc
+            });
+        } else {
+            res.status(400).send({
+                message: "Invalid Id",
+            });
+        }
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            message: "internal server error",
+            error,
+        });
+    }
+});
+
+//delete product 
+router.delete("/deleteProduct/:id", validate, roleAdmin, async (req, res) => {
+    try {
+
+        let product = await ProductModel.findOne({ _id: req.params.id });
+
+        if (product) {
+            let doc = await ProductModel.deleteOne({ _id: req.params.id });
+
+            res.status(201).send({
+                message: "product Deleted successfully",
+            });
+        } else {
+            res.status(400).send({
+                message: "Invalid Id",
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            message: "internal server error",
+            error,
+        });
+    }
+});
 
 module.exports = router;
