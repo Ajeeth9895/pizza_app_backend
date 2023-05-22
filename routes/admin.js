@@ -3,6 +3,7 @@ var router = express.Router();
 const { UserModel } = require('../schema/userSchema')
 const { OrderModel } = require('../schema/orderSchema')
 const { ProductModel } = require('../schema/productSchema')
+const {AdminModel} = require('../schema/adminSchema')
 const { dbUrl } = require('../config/dbConfig')
 const { hashPassword, hashCompare, createToken, decodeToken, validate, roleAdmin, forgetPasswordToken, decodePasswordToken } = require('../config/auth');
 const mongoose = require('mongoose');
@@ -14,7 +15,7 @@ mongoose.connect(dbUrl)
 // admin login
 router.post("/adminLogin", async (req, res) => {
     try {
-        let user = await UserModel.findOne({ email: req.body.email });
+        let user = await AdminModel.findOne({ email: req.body.email });
 
         if (user) {
             if (user.role === "admin") {
@@ -44,7 +45,7 @@ router.post("/adminLogin", async (req, res) => {
             }
         } else {
             res.status(400).send({
-                message: "Email does not exists",
+                message: "Admin can only access",
             });
         }
     } catch (error) {
@@ -55,6 +56,37 @@ router.post("/adminLogin", async (req, res) => {
         });
     }
 });
+
+
+//Creating admin
+router.post('/adminSignUp', async (req, res) => {
+    try {
+
+      let user = await AdminModel.findOne({ email: req.body.email });
+  
+      if (!user) {
+        req.body.password = await hashPassword(req.body.password);
+        let doc = new AdminModel(req.body);
+        await doc.save();
+        res.status(201).send({
+          message: "Admin added successfully",
+        });
+      } else {
+        res.status(400).send({
+          message: "Email already exists",
+        });
+      }
+
+    console.log(user);
+
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({
+        message: "internal server error",
+        error,
+      });
+    }
+  });
 
 
 //get order details
@@ -204,7 +236,7 @@ router.delete("/deleteProduct/:id", validate, roleAdmin, async (req, res) => {
             let doc = await ProductModel.deleteOne({ _id: req.params.id });
 
             res.status(201).send({
-                message: "product Deleted successfully",
+                message: "Product Deleted successfully",
             });
         } else {
             res.status(400).send({
