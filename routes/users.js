@@ -4,8 +4,9 @@ const { UserModel } = require('../schema/userSchema')
 const { dbUrl } = require('../config/dbConfig')
 const { hashPassword, hashCompare, createToken, decodeToken, validate, roleAdmin, forgetPasswordToken, decodePasswordToken } = require('../config/auth');
 const mongoose = require('mongoose');
-const {passwordEmail} = require('../service/passwordEmail')
+const { passwordEmail } = require('../service/passwordEmail')
 const jwt = require("jsonwebtoken");
+require('dotenv').config()
 
 
 
@@ -84,15 +85,17 @@ router.post("/send-email", async (req, res) => {
     let user = await UserModel.findOne({ email: req.body.email });
 
     if (user) {
-      let token = await forgetPasswordToken({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
+    
+      let firstName = user.firstName
+      let email = user.email
+
+      // creating token       
+      let token = jwt.sign({ firstName, email }, process.env.SECRETE_KEY_RESET, {
+        expiresIn: process.env.FORGOT_EXPIRES
       });
 
       const setUserToken = await UserModel.findByIdAndUpdate({ _id: user._id }, { token: token });
 
-      console.log(setUserToken);
 
       await passwordEmail({
         firstName: user.firstName,
@@ -128,7 +131,9 @@ router.get("/reset-password/:id/:token", async (req, res) => {
 
     const data = await decodePasswordToken(token);
 
-    if ((Math.floor(Date.now() / 1000) <= data.exp)) {
+
+
+    if (Math.floor(Date.now() / 1000) <= data.exp) {
       res.status(200).send({
         message: "Valid user"
       })
@@ -137,6 +142,10 @@ router.get("/reset-password/:id/:token", async (req, res) => {
         message: "Token expired"
       })
     }
+
+
+    console.log(data.exp);
+    console.log(Math.floor(Date.now() / 1000));
 
   } catch (error) {
     console.log(error);
@@ -152,11 +161,11 @@ router.get("/reset-password/:id/:token", async (req, res) => {
 //change password
 router.post("/change-password/:id/:token", async (req, res) => {
   try {
-    const token = req.params.token;
+    let token = req.params.token;
     const _id = req.params.id;
-    const password = req.body.password
+    var password = req.body.password
 
-    const changePass = await hashPassword(password);
+    var changePass = await hashPassword(password);
 
     const updatePassword = await UserModel.updateOne({ _id: _id }, { $set: { password: changePass } });
 
