@@ -131,8 +131,6 @@ router.get("/reset-password/:id/:token", async (req, res) => {
 
     const data = await decodePasswordToken(token);
 
-
-
     if (Math.floor(Date.now() / 1000) <= data.exp) {
       res.status(200).send({
         message: "Valid user"
@@ -143,9 +141,6 @@ router.get("/reset-password/:id/:token", async (req, res) => {
       })
     }
 
-
-    console.log(data.exp);
-    console.log(Math.floor(Date.now() / 1000));
 
   } catch (error) {
     console.log(error);
