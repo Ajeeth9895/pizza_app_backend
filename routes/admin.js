@@ -13,6 +13,8 @@ const jwt = require("jsonwebtoken");
 // connect database
 mongoose.connect(dbUrl)
 
+//frontend url
+let frontUrl = "https://sensational-vacherin-4870e4.netlify.app"
 
 // admin login
 router.post("/adminLogin", async (req, res) => {
@@ -282,9 +284,10 @@ router.post("/send-email", async (req, res) => {
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
-          message: `http://localhost:3000/admin-reset-password/${user._id}/${token}`
+          message: `${frontUrl}/admin-reset-password/${user._id}/${token}`
         })
   
+    
         res.status(200).send({
           message: "Email send successfully",
         });

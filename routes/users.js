@@ -13,6 +13,11 @@ require('dotenv').config()
 mongoose.connect(dbUrl)
 
 
+//frontend url
+let frontUrl = "https://sensational-vacherin-4870e4.netlify.app"
+
+
+
 //Creating users
 router.post('/signUp', async (req, res) => {
   try {
@@ -86,7 +91,7 @@ router.post("/send-email", async (req, res) => {
     let user = await UserModel.findOne({ email: req.body.email });
 
     if (user) {
-    
+
       let firstName = user.firstName
       let email = user.email
 
@@ -102,7 +107,7 @@ router.post("/send-email", async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        message: `https://sensational-vacherin-4870e4.netlify.app/reset-password/${user._id}/${setUserToken.token}`
+        message: `${frontUrl}/reset-password/${user._id}/${setUserToken.token}`
       })
 
       res.status(200).send({
