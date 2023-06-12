@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 
 
 
-const passwordEmail = async ({ email, firstName, lastName, message }) => {
+const adminEmailService = async ({ email, firstName, lastName, message }) => {
   
 
   let mailTranspoter = nodemailer.createTransport({
@@ -20,7 +20,7 @@ const passwordEmail = async ({ email, firstName, lastName, message }) => {
   let details = {
     from: process.env.USER,
     to: `${email}`,
-    subject: "Pizza-Hot Reset-password",
+    subject: "Pizza-Hot Admin-Reset-password",
     html: ` <div style="background-color: antiquewhite; margin-left:25%; margin-right:25%; padding:20px;">
       <div>
         <b>Hello ${firstName} ${lastName},</b>
@@ -49,4 +49,4 @@ const passwordEmail = async ({ email, firstName, lastName, message }) => {
 
 }
 
-module.exports =  {passwordEmail} 
+module.exports =  {adminEmailService} 

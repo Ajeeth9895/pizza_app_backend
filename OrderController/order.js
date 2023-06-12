@@ -5,7 +5,7 @@ const { dbUrl } = require('../config/dbConfig')
 const mongoose = require('mongoose');
 const { validate } = require('../config/auth');
 
-
+//connect to db
 mongoose.connect(dbUrl)
 
 //save order 

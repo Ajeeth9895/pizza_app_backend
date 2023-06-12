@@ -5,8 +5,10 @@ const { OrderModel } = require('../schema/orderSchema')
 const { ProductModel } = require('../schema/productSchema')
 const {AdminModel} = require('../schema/adminSchema')
 const { dbUrl } = require('../config/dbConfig')
+const {adminEmailService} = require('../service/adminEmailService')
 const { hashPassword, hashCompare, createToken, decodeToken, validate, roleAdmin, forgetPasswordToken, decodePasswordToken } = require('../config/auth');
 const mongoose = require('mongoose');
+const jwt = require("jsonwebtoken");
 
 // connect database
 mongoose.connect(dbUrl)
@@ -251,5 +253,109 @@ router.delete("/deleteProduct/:id", validate, roleAdmin, async (req, res) => {
         });
     }
 });
+
+
+
+//admin-send email
+router.post("/send-email", async (req, res) => {
+
+    try {
+      let user = await AdminModel.findOne({ email: req.body.email });
+
+      console.log(user);
+  
+      if (user) {
+      
+        let firstName = user.firstName
+        let email = user.email
+  
+        // creating token       
+        let token = jwt.sign({ firstName, email }, process.env.ADMIN_SECRETE_KEY_RESET, {
+          expiresIn: process.env.ADMIN_FORGOT_EXPIRES
+        });
+  
+
+        const setUserToken = await AdminModel.findByIdAndUpdate({ _id: user._id }, { token: token });
+  
+  
+        await adminEmailService({
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          message: `http://localhost:3000/admin-reset-password/${user._id}/${token}`
+        })
+  
+        res.status(200).send({
+          message: "Email send successfully",
+        });
+  
+      } else {
+        res.status(400).send({
+          message: "Email does not exists",
+        });
+      }
+  
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({
+        message: "internal server error",
+        error,
+      });
+    }
+  });
+  
+  
+  //admin verify token for reset password
+  router.get("/admin-reset-password/:id/:token", async (req, res) => {
+    try {
+      const token = req.params.token;
+  
+      const data = await decodePasswordToken(token);
+  
+      if (Math.floor(Date.now() / 1000) <= data.exp) {
+        res.status(200).send({
+          message: "Valid user"
+        })
+      } else {
+        res.status(401).send({
+          message: "Token expired"
+        })
+      }
+  
+  
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({
+        message: "internal server error",
+        error,
+      });
+    }
+  });
+  
+  
+  
+  //change password
+  router.post("/admin-change-password/:id/:token", async (req, res) => {
+    try {
+      let token = req.params.token;
+      const _id = req.params.id;
+      var password = req.body.password
+  
+      var changePass = await hashPassword(password);
+  
+      const updatePassword = await AdminModel.updateOne({ _id: _id }, { $set: { password: changePass } });
+  
+      res.status(200).send({
+        message: 'Password updated successfully'
+      })
+  
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({
+        message: "internal server error",
+        error,
+      });
+    }
+  });
 
 module.exports = router;
