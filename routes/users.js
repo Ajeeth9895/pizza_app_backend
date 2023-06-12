@@ -17,7 +17,6 @@ mongoose.connect(dbUrl)
 let frontUrl = "https://sensational-vacherin-4870e4.netlify.app"
 
 
-
 //Creating users
 router.post('/signUp', async (req, res) => {
   try {
@@ -146,7 +145,6 @@ router.get("/reset-password/:id/:token", async (req, res) => {
         message: "Token expired"
       })
     }
-
 
   } catch (error) {
     console.log(error);

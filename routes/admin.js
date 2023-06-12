@@ -16,6 +16,8 @@ mongoose.connect(dbUrl)
 //frontend url
 let frontUrl = "https://sensational-vacherin-4870e4.netlify.app"
 
+
+
 // admin login
 router.post("/adminLogin", async (req, res) => {
     try {
@@ -341,13 +343,12 @@ router.post("/send-email", async (req, res) => {
   router.post("/admin-change-password/:id/:token", async (req, res) => {
     try {
       let token = req.params.token;
-      const _id = req.params.id;
       var password = req.body.password
-  
+
       var changePass = await hashPassword(password);
-  
-      const updatePassword = await AdminModel.updateOne({ _id: _id }, { $set: { password: changePass } });
-  
+   
+      const updatePassword = await AdminModel.findByIdAndUpdate({ _id: req.params.id }, { password: changePass });
+
       res.status(200).send({
         message: 'Password updated successfully'
       })
@@ -360,5 +361,6 @@ router.post("/send-email", async (req, res) => {
       });
     }
   });
+
 
 module.exports = router;
